@@ -49,7 +49,9 @@ parser::parser(string path){
         dataCode.push_back(dataInstruction);
     }
     handleData();
-
+    if(error == 1){
+        return;
+    }
     for(auto textLines :textSeg){
         line = textLines;
         vector<string> instruction = convert(1);
