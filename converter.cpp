@@ -371,6 +371,9 @@ void converter::assemblytomachine()
             string imm = binCheck(x, 21);
             machineCodeBin = imm.substr(0, 1) + imm.substr(10, 10) + imm.substr(9, 1) + imm.substr(1, 8) + rd + opc;
         }
+        else{
+            
+        }
         string machineCodeHex = bintoHex(machineCodeBin);
 
         std::cout << "0x" << std::hex << val.second;
