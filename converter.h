@@ -16,6 +16,7 @@ public:
     std::string bintoHex(std::string);
     std::string hextoBin(std::string, int len);
     std::string octToBin(std::string, int len);
+    std::string binCheck(std::string, int len);
     void assemblytomachine();
 };
 #endif
