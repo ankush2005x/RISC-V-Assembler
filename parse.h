@@ -3,13 +3,14 @@ using namespace std;
 #ifndef parse_H
 #define parse_H
 
-class parser{
+class parser
+{
 private:
     ifstream fileInput;
     string line;
     int lineNum = 0;
 
-    map <string, int> labels; 
+    map<string, int> labels;
 
     bool error = false;
     string raiseError;
