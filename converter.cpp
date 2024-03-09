@@ -29,23 +29,42 @@ string converter::tobinary(string x, int len)
 {
     int n = x.length();
     int num = 0;
-    for (int i = 0; i < n; i++)
+    if (x[0] != '-')
     {
-        num += (x[i] - '0') * pow(10, n - i - 1);
+        for (int i = 0; i < n; i++)
+        {
+            num += (x[i] - '0') * pow(10, n - i - 1);
+        }
+        string binary = "";
+        while (num > 0)
+        {
+            binary = to_string(num % 2) + binary;
+            num = num / 2;
+        }
+        string binary2 = "";
+        for (int i = 1; i <= len - binary.size(); i++)
+        {
+            binary2 = binary2 + "0";
+        }
+        binary = binary2 + binary;
+        return binary;
     }
-    string binary = "";
-    while (num > 0)
+    else
     {
-        binary = to_string(num % 2) + binary;
-        num = num / 2;
+        x = x.substr(1);
+        for (int i = 0; i < n - 1; i++)
+        {
+            num += (x[i] - '0') * pow(10, n - i - 2);
+        }
+        num = pow(2, len) - num;
+        string binary = "";
+        while (num > 0)
+        {
+            binary = to_string(num % 2) + binary;
+            num = num / 2;
+        }
+        return binary;
     }
-    string binary2 = "";
-    for (int i = 1; i <= len - binary.size(); i++)
-    {
-        binary2 = binary2 + "0";
-    }
-    binary = binary2 + binary;
-    return binary;
 }
 string converter::bintoHex(string x)
 {
