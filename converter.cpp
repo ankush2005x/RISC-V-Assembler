@@ -341,9 +341,15 @@ void converter::assemblytomachine()
             x = (val.first)[2].substr(1);
             string r2 = tobinary(x, 5);
             x = (val.first)[3];
+            string bit12th;
+            if (x[0] == '-')
+                bit12th = "1";
+            else
+                bit12th = "0";
             string imm = binCheck(x, 12);
             string fxn3 = mo73[y][1];
-            machineCodeBin = imm.substr(11, 1) + imm.substr(1, 6) + r2 + r1 + fxn3 + imm.substr(7, 4) + imm.substr(11, 1) + opc;
+
+            machineCodeBin = bit12th + imm.substr(1, 6) + r2 + r1 + fxn3 + imm.substr(7, 4) + imm.substr(0, 1) + opc;
         }
         else if (m[y] == 6)
         {
@@ -360,12 +366,17 @@ void converter::assemblytomachine()
             string x = (val.first)[1].substr(1);
             string rd = tobinary(x, 5);
             x = (val.first)[2];
+            string bit20th;
+            if (x[0] == '-')
+                bit20th = "1";
+            else
+                bit20th = "0";
             string imm = binCheck(x, 20);
-            machineCodeBin = imm.substr(19, 1) + imm.substr(9, 10) + imm.substr(8, 1) + imm.substr(0, 8) + rd + opc;
+            machineCodeBin = bit20th + imm.substr(9, 10) + imm.substr(8, 1) + imm.substr(0, 8) + rd + opc;
         }
         string machineCodeHex = bintoHex(machineCodeBin);
 
-        std::cout << "0X" << std::hex << val.second;
+        std::cout << "0x" << std::hex << val.second;
         std::cout << "\t" << machineCodeHex << "\n";
     }
 }
