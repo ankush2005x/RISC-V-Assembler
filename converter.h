@@ -11,10 +11,11 @@ private:
 
 public:
     converter(vector<pair<vector<std::string>, int>>);
+    std::string tobinary(std::string, int len);
     std::string tobinary(std::string);
     std::string bintoHex(std::string);
-    std::string hextoBin(std::string);
-    std::string octToBin(std::string);
+    std::string hextoBin(std::string, int len);
+    std::string octToBin(std::string, int len);
     void assemblytomachine();
 };
 #endif
