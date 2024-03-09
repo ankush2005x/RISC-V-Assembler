@@ -5,6 +5,7 @@
 #include <vector>
 #include "converter.h"
 using namespace std;
+
 converter::converter(vector<pair<vector<std::string>, int>> code)
 {
     this->code = code;
@@ -12,7 +13,7 @@ converter::converter(vector<pair<vector<std::string>, int>> code)
 string converter::tobinary(string x)
 {
     int n = x.length();
-    int num = 0;
+    long long num = 0;
     for (int i = 0; i < n; i++)
     {
         num += (x[i] - '0') * pow(10, n - i - 1);
@@ -28,7 +29,7 @@ string converter::tobinary(string x)
 string converter::tobinary(string x, int len)
 {
     int n = x.length();
-    int num = 0;
+    long long num = 0;
     if (x[0] != '-')
     {
         for (int i = 0; i < n; i++)
@@ -69,7 +70,7 @@ string converter::tobinary(string x, int len)
 string converter::bintoHex(string x)
 {
     int n = x.length();
-    int num = 0;
+    long long num = 0;
     for (int i = 0; i < n; i++)
     {
         num += (x[i] - '0') * pow(2, n - i - 1);
@@ -331,7 +332,7 @@ void converter::assemblytomachine()
             x = (val.first)[3].substr(1);
             string r2 = tobinary(x, 5);
             string fxn3 = mo73[y][1];
-            machineCodeBin = imm.substr(0, 7) + r2 + r1 + fxn3 + imm.substr(7, 5) + opc;
+            machineCodeBin = imm.substr(0, 7) + r1 + r2 + fxn3 + imm.substr(7, 5) + opc;
         }
         else if (m[y] == 5)
         {
