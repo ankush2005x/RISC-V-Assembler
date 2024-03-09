@@ -265,7 +265,7 @@ void converter::assemblytomachine()
             string fxn3 = mo73[y][2];
             x = (val.first)[3].substr(1);
             string r2 = tobinary(x, 5);
-            machineCodeBin = fxn7 + r1 + r2 + fxn3 + rd + opc;
+            machineCodeBin = fxn7 + r2 + r1 + fxn3 + rd + opc;
         }
         else if (m[y] == 2)
         {
@@ -276,24 +276,31 @@ void converter::assemblytomachine()
             string r1 = tobinary(x, 5);
             string fxn3 = mo73[y][1];
             x = (val.first)[3];
-            if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+            if (x.size() == 1)
             {
-                x = x.substr(2);
-                x = hextoBin(x, 12);
-            }
-            else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
-            {
-                x = x.substr(2);
-                // x = tobinary(x);
-            }
-            else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
-            {
-                x = x.substr(2);
-                x = octToBin(x, 12);
+                x = tobinary(x, 12);
             }
             else
             {
-                x = tobinary(x, 12);
+                if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+                {
+                    x = x.substr(2);
+                    x = hextoBin(x, 12);
+                }
+                else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
+                {
+                    x = x.substr(2);
+                    // x = tobinary(x);
+                }
+                else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
+                {
+                    x = x.substr(2);
+                    x = octToBin(x, 12);
+                }
+                else
+                {
+                    x = tobinary(x, 12);
+                }
             }
             string imm = x;
             machineCodeBin = imm + r1 + fxn3 + rd + opc;
@@ -303,28 +310,35 @@ void converter::assemblytomachine()
             string opc = mo73[y][0];
             string x = (val.first)[1].substr(1);
             string rd = tobinary(x, 5);
-            x = (val.first)[2].substr(1);
-            if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
-            {
-                x = x.substr(2);
-                x = hextoBin(x, 12);
-            }
-            else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
-            {
-                x = x.substr(2);
-                // x = tobinary(x);
-            }
-            else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
-            {
-                x = x.substr(2);
-                x = octToBin(x, 12);
-            }
-            else
+            x = (val.first)[2];
+            if (x.size() == 1)
             {
                 x = tobinary(x, 12);
             }
+            else
+            {
+                if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+                {
+                    x = x.substr(2);
+                    x = hextoBin(x, 12);
+                }
+                else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
+                {
+                    x = x.substr(2);
+                    // x = tobinary(x);
+                }
+                else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
+                {
+                    x = x.substr(2);
+                    x = octToBin(x, 12);
+                }
+                else
+                {
+                    x = tobinary(x, 12);
+                }
+            }
             string imm = x;
-            x = (val.first)[3];
+            x = (val.first)[3].substr(1);
             string r1 = tobinary(x, 5);
             string fxn3 = mo73[y][1];
             machineCodeBin = imm + r1 + fxn3 + rd + opc;
@@ -334,31 +348,38 @@ void converter::assemblytomachine()
             string opc = mo73[y][0];
             string x = (val.first)[1].substr(1);
             string r1 = tobinary(x, 5);
-            x = (val.first)[2].substr(1);
-            if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+            x = (val.first)[2];
+            if (x.size() == 1)
             {
-                x = x.substr(2);
-                x = hextoBin(x, 12);
-            }
-            else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
-            {
-                x = x.substr(2);
-                // x = tobinary(x);
-            }
-            else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
-            {
-                x = x.substr(2);
-                x = octToBin(x, 12);
+                x = tobinary(x, 12);
             }
             else
             {
-                x = tobinary(x, 12);
+                if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+                {
+                    x = x.substr(2);
+                    x = hextoBin(x, 12);
+                }
+                else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
+                {
+                    x = x.substr(2);
+                    // x = tobinary(x);
+                }
+                else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
+                {
+                    x = x.substr(2);
+                    x = octToBin(x, 12);
+                }
+                else
+                {
+                    x = tobinary(x, 12);
+                }
             }
             string imm = x;
             x = (val.first)[3].substr(1);
             string r2 = tobinary(x, 5);
             string fxn3 = mo73[y][1];
-            machineCodeBin = imm.substr(5) + r1 + r2 + fxn3 + imm.substr(0, 5) + opc;
+            machineCodeBin = imm.substr(0, 7) + r2 + r1 + fxn3 + imm.substr(7, 5) + opc;
         }
         else if (m[y] == 5)
         {
@@ -368,28 +389,35 @@ void converter::assemblytomachine()
             x = (val.first)[2].substr(1);
             string r2 = tobinary(x, 5);
             x = (val.first)[3];
-            if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
-            {
-                x = x.substr(2);
-                x = hextoBin(x, 12);
-            }
-            else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
-            {
-                x = x.substr(2);
-                // x = tobinary(x);
-            }
-            else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
-            {
-                x = x.substr(2);
-                x = octToBin(x, 12);
-            }
-            else
+            if (x.size() == 1)
             {
                 x = tobinary(x, 12);
             }
+            else
+            {
+                if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+                {
+                    x = x.substr(2);
+                    x = hextoBin(x, 12);
+                }
+                else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
+                {
+                    x = x.substr(2);
+                    // x = tobinary(x);
+                }
+                else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
+                {
+                    x = x.substr(2);
+                    x = octToBin(x, 12);
+                }
+                else
+                {
+                    x = tobinary(x, 12);
+                }
+            }
             string imm = x;
             string fxn3 = mo73[y][1];
-            machineCodeBin = imm.substr(11) + imm.substr(4, 6) + r2 + r1 + fxn3 + imm.substr(0, 4) + imm.substr(10, 1) + opc;
+            machineCodeBin = imm.substr(11, 1) + imm.substr(1, 6) + r2 + r1 + fxn3 + imm.substr(7, 4) + imm.substr(11, 1) + opc;
         }
         else if (m[y] == 6)
         {
@@ -397,24 +425,31 @@ void converter::assemblytomachine()
             string x = (val.first)[1].substr(1);
             string rd = tobinary(x, 5);
             x = (val.first)[2];
-            if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+            if (x.size() == 1)
             {
-                x = x.substr(2);
-                x = hextoBin(x, 12);
-            }
-            else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
-            {
-                x = x.substr(2);
-                // x = tobinary(x);
-            }
-            else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
-            {
-                x = x.substr(2);
-                x = octToBin(x, 12);
+                x = tobinary(x, 12);
             }
             else
             {
-                x = tobinary(x, 12);
+                if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+                {
+                    x = x.substr(2);
+                    x = hextoBin(x, 12);
+                }
+                else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
+                {
+                    x = x.substr(2);
+                    // x = tobinary(x);
+                }
+                else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
+                {
+                    x = x.substr(2);
+                    x = octToBin(x, 12);
+                }
+                else
+                {
+                    x = tobinary(x, 12);
+                }
             }
             string imm = x;
             machineCodeBin = imm + rd + opc;
@@ -425,31 +460,38 @@ void converter::assemblytomachine()
             string x = (val.first)[1].substr(1);
             string rd = tobinary(x, 5);
             x = (val.first)[2];
-            if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
-            {
-                x = x.substr(2);
-                x = hextoBin(x, 12);
-            }
-            else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
-            {
-                x = x.substr(2);
-                // x = tobinary(x);
-            }
-            else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
-            {
-                x = x.substr(2);
-                x = octToBin(x, 12);
-            }
-            else
+            if (x.size() == 1)
             {
                 x = tobinary(x, 12);
             }
+            else
+            {
+                if (x[0] == '0' and (x[1] == 'x' or x[1] == 'X'))
+                {
+                    x = x.substr(2);
+                    x = hextoBin(x, 20);
+                }
+                else if (x[0] == '0' and (x[1] == 'b' or x[1] == 'B'))
+                {
+                    x = x.substr(2);
+                    // x = tobinary(x);
+                }
+                else if (x[0] == '0' and (x[1] == 'o' or x[1] == 'O'))
+                {
+                    x = x.substr(2);
+                    x = octToBin(x, 20);
+                }
+                else
+                {
+                    x = tobinary(x, 20);
+                }
+            }
             string imm = x;
-            machineCodeBin = imm.substr(19) + imm.substr(0, 10) + imm.substr(10, 1) + imm.substr(11, 8) + rd + opc;
+            machineCodeBin = imm.substr(19, 1) + imm.substr(9, 10) + imm.substr(8, 1) + imm.substr(0, 8) + rd + opc;
         }
         string machineCodeHex = bintoHex(machineCodeBin);
 
-        cout << "0x" << std::hex << val.second;
-        cout << "\t" << machineCodeHex << "\n";
+        std::cout << "0x" << std::hex << val.second;
+        std::cout << "\t" << machineCodeHex << "\n";
     }
 }
