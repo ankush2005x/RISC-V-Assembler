@@ -4,13 +4,17 @@
 #include <string>
 #include <utility>
 using namespace std;
+//  class converter is made to convert the assembly code to machine code
+// it has all the main functions to convert the assembly code to machine code
 class converter
 {
 private:
+//  all the variables and containers to be used are made private
     vector<pair<vector<std::string>, int>> code;
     vector<pair<int, string>> errorGenerator;
 
 public:
+    // all the functions to be used are made public
     converter(vector<pair<vector<std::string>, int>>);
     std::string tobinary(std::string, int len);
     std::string tobinary(std::string);
