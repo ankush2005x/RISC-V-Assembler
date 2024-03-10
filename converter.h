@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <bits/stdc++.h>
 using namespace std;
 class converter
 {
@@ -17,6 +18,9 @@ public:
     std::string hextoBin(std::string, int len);
     std::string octToBin(std::string, int len);
     std::string binCheck(std::string, int len);
+    void noOfArgumentsError(multimap<int,std::string> &error, int, int, std::string);
+    void immCheck(std::string, multimap<int,std::string> &error, int, int);
+    void registerCheck(std::string, multimap<int,std::string> &error, int, int);
     void assemblytomachine();
 };
 #endif
