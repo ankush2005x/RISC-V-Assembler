@@ -12,6 +12,7 @@ private:
     map <string, int> textLabels;
 
     int dataLoc = 268435456;         //0x10000000
+    // all functions to be used in the constructor
     void removeComments();
     void strip();
     void Character_Check(string word, int lineNum);
@@ -23,7 +24,7 @@ private:
     void handleData();
     void storeData(vector<string> dataLine, int increase);
     vector<string> convert(bool DorT);
-
+    // making regMap to replace the register names with the register numbers
     map<string, string> regMap = {
         {"ra", "x1"},
         {"sp", "x2"},
@@ -60,13 +61,13 @@ private:
     };
 
 public:
-
+    //  all the variables and containers to be used in the constructor
     vector<pair<vector<string>, int>> code;
     vector<vector<string>> dataCode;
     map<string, int> dataLabels;
     bool error = false;
     string raiseError;
-
+    // constructor
     parser(string path);
     void print();
 };
