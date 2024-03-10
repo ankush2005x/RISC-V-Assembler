@@ -1,12 +1,9 @@
 #include <bits/stdc++.h>
-#include <iostream>
-#include <string>
-#include <cmath>
-#include <map>
-#include <vector>
 #include "converter.h"
-#include <bitset>
+
 using namespace std;
+
+extern ofstream fout;
 
 converter::converter(vector<pair<vector<std::string>, int>> code)
 {
@@ -620,8 +617,8 @@ void converter::basicConverter(pair<vector<string>, int> val)
         return;
     }
     string machineCodeHex = bintoHex(machineCodeBin);
-    std::cout << "0x" << std::hex << val.second;
-    std::cout << "\t" << machineCodeHex << "\n";
+    fout << "0x" << std::hex << val.second;
+    fout << "\t" << machineCodeHex << "\n";
 }
 
 void converter::assemblytomachine()
@@ -750,7 +747,7 @@ void converter::assemblytomachine()
         {
             if ((val.first).size() == 3)
             {
-                int address = stoi((val.first)[2]);
+                int address = stoi((val.first)[2]) - val.second;
                 int first20 = (address >> 12) & ((1 << 20) - 1);
                 int last12 = (address & ((1 << 12) - 1));
                 if (last12 > (1 << 11) - 1)
@@ -758,11 +755,11 @@ void converter::assemblytomachine()
                     last12 -= (1 << 12);
                     first20 += 1;
                 }
-                vector<string> temp = {"auipc", (val.first)[1], "65536"};
-                basicConverter(pair<vector<string>, int>(temp, val.second));
-                // instruction_convert({{"auipc", (val.first)[1], to_string(first20)}, val.second});
-                basicConverter({{"lw", (val.first)[1], to_string(stoll((val.first)[2]) - 268435456 - val.second), (val.first)[1]}, val.second + 4});
-                // instruction_convert({{"lw", (val.first)[1], to_string(last12), (val.first)[1]}, val.second + 4});
+                // vector<string> temp = {"auipc", (val.first)[1], "65536"};
+                //  basicConverter(pair<vector<string>, int>(temp, val.second));
+                basicConverter({{"auipc", (val.first)[1], to_string(first20)}, val.second});
+                // basicConverter({{"lw", (val.first)[1], to_string(stoll((val.first)[2]) - 268435456 - val.second), (val.first)[1]}, val.second + 4});
+                basicConverter({{"lw", (val.first)[1], to_string(last12), (val.first)[1]}, val.second + 4});
             }
 
             else
@@ -770,7 +767,7 @@ void converter::assemblytomachine()
         }
         else if (y == "la")
         {
-            int address = stoi((val.first)[2]);
+            int address = stoi((val.first)[2]) - val.second;
 
             int first20 = (address >> 12) & ((1 << 20) - 1);
             int last12 = (address & ((1 << 12) - 1));
@@ -786,7 +783,7 @@ void converter::assemblytomachine()
         }
         else if (y == "li")
         {
-            int value = stoi((val.first)[2]);
+            int value = stoi((val.first)[2]) - val.second;
 
             int first20 = (value >> 12) & ((1 << 20) - 1);
             int last12 = (value & ((1 << 12) - 1));
@@ -795,7 +792,7 @@ void converter::assemblytomachine()
                 last12 -= (1 << 12);
                 first20 += 1;
             }
-            cout << first20 << "\n";
+
             basicConverter({{"lui", (val.first)[1], to_string(first20)}, val.second});
             basicConverter({{"addi", (val.first)[1], val.first[1], to_string(last12)}, val.second + 4});
         }
