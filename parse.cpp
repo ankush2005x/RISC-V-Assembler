@@ -4,9 +4,10 @@ using namespace std;
 #include "parse.h"
 
 extern ofstream fout;
-
+// extern ofstream fout for writing to output.mc file.
 parser::parser(string path){
     fileInput.open(path);
+    // fileInput.open for reading the input file.
     fout.open("output.mc");
     if(!fileInput.is_open() || !fout.is_open()){
         error = 1;
@@ -16,7 +17,7 @@ parser::parser(string path){
     bool text = 0;
     vector<string> dataSeg;
     vector<string> textSeg;
-
+    // dataSeg and textSeg for storing the data and text segments of the input file.
     while(getline(fileInput, line)){
         removeComments();
         strip();
@@ -44,11 +45,13 @@ parser::parser(string path){
             }
         }
     }
+    // dataSeg and textSeg are filled with the data and text segments of the input file.
     for(auto dataLines: dataSeg){
         line = dataLines;
         vector<string> dataInstruction = convert(0);
         dataCode.push_back(dataInstruction);
     }
+    // dataCode is filled with the data instructions of the input file.
     handleData();
     if(error == 1){
         return;
@@ -65,11 +68,12 @@ parser::parser(string path){
         }
         
     }
+    // code is filled with the text instructions of the input file.
     labelToOffset();
     replaceReg();
     fileInput.close();
 }
-
+// parser constructor for parsing the input file and storing the data and text segments in dataCode and code respectively.
 void parser::handleData(){
     for (auto dataLine : dataCode){
         if (dataLine[1] == ".word")
@@ -82,12 +86,13 @@ void parser::handleData(){
             storeData(dataLine, 1);
         else{
             error = 1;
+            // when the data type is invalid or missing.
             raiseError = "Data type is invalid or missing.";
             return;
         }
     }
 }
-
+// handleData function for storing the data instructions in the dataLabels map.
 void parser::storeData(vector<string> dataLine, int increase){
     dataLabels[dataLine[0]] = dataLoc;
     for (int i = 2; i < dataLine.size(); i++){
@@ -95,7 +100,7 @@ void parser::storeData(vector<string> dataLine, int increase){
         dataLoc += increase;
     }
 }
-
+// storeData function for storing the data instructions in the dataLabels map.
 void parser::labelToOffset(){
     int offsetLineNum = 0;
     for(int i=0; i<code.size(); i++){
@@ -125,7 +130,7 @@ void parser::labelToOffset(){
     }
 
 }
-
+// labelToOffset function for converting the labels to offsets in the text instructions.
 void parser::replaceReg(){
     for(int i=0; i<code.size(); i++){
         for(int j=0; j<code[i].first.size(); j++){
@@ -135,7 +140,7 @@ void parser::replaceReg(){
         }
     }
 }
-
+// replaceReg function for replacing the registers with their respective numbers in the text instructions.
 void parser::removeComments(){
     for(int i=0; i<(int)line.size(); i++){
 
@@ -146,7 +151,7 @@ void parser::removeComments(){
     }
 
 }
-
+// removeComments function for removing the comments from the input file.
 void parser::Character_Check(string word, int lineNum){
     for(auto x: word){
         if((x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z') || (x>='0' && x<='9') || x == '-'){
@@ -159,17 +164,17 @@ void parser::Character_Check(string word, int lineNum){
     }
     return;
 }
-
+// Character_Check function for checking if the characters in the instruction are valid or not.
 void parser::Label_Error(int lineNum){
     error = 1;
     raiseError = "Invalid Label Naming. \nLine number: " + to_string(lineNum);
 }
-
+//  Label_Error function for checking if the label naming is valid or not.
 void parser::Label_Exists_Error(int lineNum){
     error = 1;
     raiseError = "Duplicate Labels Not Allowed. \nLine number: " + to_string(lineNum);
 }
-
+// Label_Exists_Error function for checking if the label already exists or not.
 void parser::strip(){
     int start = 0;
     int end = (int)line.size();
@@ -192,15 +197,13 @@ void parser::strip(){
     }
     
 }
-
+// strip function for removing the leading and trailing whitespaces from the input file.
 vector<string> parser::convert(bool DorT){      // pass 0 for data instructions, 1 for text instructions.
     vector<string> instruction; 
     string word;
     bool valid = 1;
     string labelName = "";
-    
-    
-    
+
     for(int i=0; i<(int)line.size(); i++){
         
         if(line[i] == ':'){
@@ -221,7 +224,6 @@ vector<string> parser::convert(bool DorT){      // pass 0 for data instructions,
                     
                     labelName = word;
                 }
-                
                 word.clear();
             }
 
@@ -252,16 +254,20 @@ vector<string> parser::convert(bool DorT){      // pass 0 for data instructions,
         }
         
     }
+    // cout << word << "\n";
     if(!word.empty()){
+        // when the last word is not empty.
         instruction.push_back(word);
         word.clear();
     }
     for(int i=0; i<(int)instruction.size(); i++){
         if(DorT == 0 && i < 2){
+            // when the instruction is a data instruction.
             continue;
         }
         Character_Check(instruction[i], lineNum);
         if(error){
+            // when the characters in the instruction are invalid.
             return vector<string>();
         }
     }
