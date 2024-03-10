@@ -27,16 +27,27 @@ string converter::tobinary(string x)
     }
     return binary;
 }
+long long converter::pow(int a, int b)
+{
+    long long num = 1;
+    for (int i = 0; i < b; i++)
+    {
+        num *= a;
+    }
+    return num;
+}
 string converter::tobinary(string x, int len)
 {
     int n = x.length();
     long long num = 0;
     if (x[0] != '-')
     {
-        for (int i = 0; i < n; i++)
-        {
-            num += (x[i] - '0') * pow(10, n - i - 1);
-        }
+        // for (int i = 0; i < n; i++)
+        // {
+        //     num += (x[i] - '0') * pow(10, n - i - 1);
+        //     cout << "num " << num << endl;
+        // }
+        // cout << "num " << num << endl;
         string binary = "";
         while (num > 0)
         {
@@ -166,9 +177,97 @@ string converter::binCheck(string x, int len)
     }
     return x;
 }
+void converter::instruction_convert(pair<vector<string>, int> val)
+{
+    string machineCodeBin;
+    string y = (val.first)[0];
+    if (m[y] == 1) // 1 for r type
+    {
+        string opc = mo73[y][0];
+        string x = (val.first)[1].substr(1);
+        string rd = tobinary(x, 5);
+        x = (val.first)[2].substr(1);
+        string r1 = tobinary(x, 5);
+        string fxn7 = mo73[y][1];
+        string fxn3 = mo73[y][2];
+        x = (val.first)[3].substr(1);
+        string r2 = tobinary(x, 5);
+        machineCodeBin = fxn7 + r2 + r1 + fxn3 + rd + opc;
+    }
+    else if (m[y] == 2)
+    {
+        string opc = mo73[y][0];
+        string x = (val.first)[1].substr(1);
+        string rd = tobinary(x, 5);
+        x = (val.first)[2].substr(1);
+        string r1 = tobinary(x, 5);
+        string fxn3 = mo73[y][1];
+        x = (val.first)[3];
+        string imm = binCheck(x, 12);
+        machineCodeBin = imm + r1 + fxn3 + rd + opc;
+    }
+    else if (m[y] == 3)
+    {
+        string opc = mo73[y][0];
+        string x = (val.first)[1].substr(1);
+        string rd = tobinary(x, 5);
+        x = (val.first)[2];
+        string imm = binCheck(x, 12);
+        x = (val.first)[3].substr(1);
+        string r1 = tobinary(x, 5);
+        string fxn3 = mo73[y][1];
+        machineCodeBin = imm + r1 + fxn3 + rd + opc;
+    }
+    else if (m[y] == 4)
+    {
+        string opc = mo73[y][0];
+        string x = (val.first)[1].substr(1);
+        string r1 = tobinary(x, 5);
+        x = (val.first)[2];
+        string imm = binCheck(x, 12);
+        x = (val.first)[3].substr(1);
+        string r2 = tobinary(x, 5);
+        string fxn3 = mo73[y][1];
+        machineCodeBin = imm.substr(0, 7) + r1 + r2 + fxn3 + imm.substr(7, 5) + opc;
+    }
+    else if (m[y] == 5)
+    {
+        string opc = mo73[y][0];
+        string x = (val.first)[1].substr(1);
+        string r1 = tobinary(x, 5);
+        x = (val.first)[2].substr(1);
+        string r2 = tobinary(x, 5);
+        x = (val.first)[3];
+        string imm = binCheck(x, 13);
+        string fxn3 = mo73[y][1];
+
+        machineCodeBin = imm.substr(0, 1) + imm.substr(2, 6) + r2 + r1 + fxn3 + imm.substr(8, 4) + imm.substr(1, 1) + opc;
+    }
+    else if (m[y] == 6)
+    {
+        string opc = mo73[y][0];
+        string x = (val.first)[1].substr(1);
+        string rd = tobinary(x, 5);
+        x = (val.first)[2];
+        string imm = binCheck(x, 20);
+        machineCodeBin = imm + rd + opc;
+    }
+    else if (m[y] == 7)
+    {
+        string opc = mo73[y][0];
+        string x = (val.first)[1].substr(1);
+        string rd = tobinary(x, 5);
+        x = (val.first)[2];
+        string imm = binCheck(x, 21);
+        machineCodeBin = imm.substr(0, 1) + imm.substr(10, 10) + imm.substr(9, 1) + imm.substr(1, 8) + rd + opc;
+    }
+    string machineCodeHex = bintoHex(machineCodeBin);
+
+    std::cout << "0x" << val.second;
+    std::cout << "\t" << machineCodeHex << "\n";
+}
 void converter::assemblytomachine()
 {
-    map<string, int> m;
     m["add"] = 1;
     m["and"] = 1;
     m["or"] = 1;
@@ -206,7 +305,6 @@ void converter::assemblytomachine()
     m["lui"] = 6;
     // UJ type
     m["jal"] = 7;
-    map<string, vector<string>> mo73; // opcode fxn 7 and fxn 3
     // R type
     mo73["add"].push_back("0110011");
     mo73["and"].push_back("0110011");
@@ -289,91 +387,26 @@ void converter::assemblytomachine()
     mo73["jal"].push_back("1101111");
     for (auto val : code)
     {
-        string machineCodeBin;
         string y = (val.first)[0];
-        if (m[y] == 1) // 1 for r type
+        if (y == "lw")
         {
-            string opc = mo73[y][0];
-            string x = (val.first)[1].substr(1);
-            string rd = tobinary(x, 5);
-            x = (val.first)[2].substr(1);
-            string r1 = tobinary(x, 5);
-            string fxn7 = mo73[y][1];
-            string fxn3 = mo73[y][2];
-            x = (val.first)[3].substr(1);
-            string r2 = tobinary(x, 5);
-            machineCodeBin = fxn7 + r2 + r1 + fxn3 + rd + opc;
+            if ((val.first).size() == 3)
+            {
+                vector<string> temp = {"auipc", (val.first)[1], "65536"};
+                instruction_convert(pair<vector<string>, int>(temp, val.second));
+                instruction_convert({{"lw",
+                                      (val.first)[1], to_string(stoll((val.first)[2]) - 268435456 - val.second), (val.first)[1]},
+                                     val.second + 4});
+            }
+            else
+                instruction_convert(val);
         }
-        else if (m[y] == 2)
+        else if (y == "la")
         {
-            string opc = mo73[y][0];
-            string x = (val.first)[1].substr(1);
-            string rd = tobinary(x, 5);
-            x = (val.first)[2].substr(1);
-            string r1 = tobinary(x, 5);
-            string fxn3 = mo73[y][1];
-            x = (val.first)[3];
-            string imm = binCheck(x, 12);
-            machineCodeBin = imm + r1 + fxn3 + rd + opc;
+            instruction_convert({{"auipc", (val.first)[1], "65536"}, val.second});
+            instruction_convert({{"addi", (val.first)[1], val.first[1], to_string(stoll((val.first)[2]) - 268435456 - val.second)}, val.second + 4});
         }
-        else if (m[y] == 3)
-        {
-            string opc = mo73[y][0];
-            string x = (val.first)[1].substr(1);
-            string rd = tobinary(x, 5);
-            x = (val.first)[2];
-            string imm = binCheck(x, 12);
-            x = (val.first)[3].substr(1);
-            string r1 = tobinary(x, 5);
-            string fxn3 = mo73[y][1];
-            machineCodeBin = imm + r1 + fxn3 + rd + opc;
-        }
-        else if (m[y] == 4)
-        {
-            string opc = mo73[y][0];
-            string x = (val.first)[1].substr(1);
-            string r1 = tobinary(x, 5);
-            x = (val.first)[2];
-            string imm = binCheck(x, 12);
-            x = (val.first)[3].substr(1);
-            string r2 = tobinary(x, 5);
-            string fxn3 = mo73[y][1];
-            machineCodeBin = imm.substr(0, 7) + r1 + r2 + fxn3 + imm.substr(7, 5) + opc;
-        }
-        else if (m[y] == 5)
-        {
-            string opc = mo73[y][0];
-            string x = (val.first)[1].substr(1);
-            string r1 = tobinary(x, 5);
-            x = (val.first)[2].substr(1);
-            string r2 = tobinary(x, 5);
-            x = (val.first)[3];
-            string imm = binCheck(x, 13);
-            string fxn3 = mo73[y][1];
-
-            machineCodeBin = imm.substr(0, 1) + imm.substr(2, 6) + r2 + r1 + fxn3 + imm.substr(8, 4) + imm.substr(1, 1) + opc;
-        }
-        else if (m[y] == 6)
-        {
-            string opc = mo73[y][0];
-            string x = (val.first)[1].substr(1);
-            string rd = tobinary(x, 5);
-            x = (val.first)[2];
-            string imm = binCheck(x, 20);
-            machineCodeBin = imm + rd + opc;
-        }
-        else if (m[y] == 7)
-        {
-            string opc = mo73[y][0];
-            string x = (val.first)[1].substr(1);
-            string rd = tobinary(x, 5);
-            x = (val.first)[2];
-            string imm = binCheck(x, 21);
-            machineCodeBin = imm.substr(0, 1) + imm.substr(10, 10) + imm.substr(9, 1) + imm.substr(1, 8) + rd + opc;
-        }
-        string machineCodeHex = bintoHex(machineCodeBin);
-
-        std::cout << "0x" << std::hex << val.second;
-        std::cout << "\t" << machineCodeHex << "\n";
+        else
+            instruction_convert(val);
     }
 }
