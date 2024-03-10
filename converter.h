@@ -12,6 +12,8 @@ private:
 //  all the variables and containers to be used are made private
     vector<pair<vector<std::string>, int>> code;
     vector<pair<int, string>> errorGenerator;
+    map<string, int> m;
+    map<string, vector<string>> mo73; // opcode fxn 7 and fxn 3
 
 public:
     // all the functions to be used are made public
@@ -22,6 +24,8 @@ public:
     std::string hextoBin(std::string, int len);
     std::string octToBin(std::string, int len);
     std::string binCheck(std::string, int len);
+
+    void basicConverter(pair<vector<string>, int> val);
     void noOfArgumentsError(int, int, std::string);
     int immCheck(std::string, int, int);
     int registerCheck(std::string, int, int);
