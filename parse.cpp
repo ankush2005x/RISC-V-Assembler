@@ -3,11 +3,12 @@
 using namespace std;
 #include "parse.h"
 
-
+extern ofstream fout;
 
 parser::parser(string path){
     fileInput.open(path);
-    if(!fileInput.is_open()){
+    fout.open("output.mc");
+    if(!fileInput.is_open() || !fout.is_open()){
         error = 1;
         return;
     }
@@ -65,7 +66,7 @@ parser::parser(string path){
         
     }
     labelToOffset();
-    
+    fileInput.close();
 }
 
 void parser::handleData(){
@@ -89,21 +90,36 @@ void parser::handleData(){
 void parser::storeData(vector<string> dataLine, int increase){
     dataLabels[dataLine[0]] = dataLoc;
     for (int i = 2; i < dataLine.size(); i++){
-        cout << "0x" << hex << dataLoc << " " << dataLine[i]<< "\n";
+        fout << "0x" << hex << dataLoc << " " << "0x" << stoi(dataLine[i])<< "\n";
         dataLoc += increase;
     }
 }
 
 void parser::labelToOffset(){
+    int offsetLineNum = 0;
     for(int i=0; i<code.size(); i++){
-        for(int j=0; j<code[i].first.size(); j++){
-            if(textLabels[code[i].first[j]] != 0){
-                code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second);
-            }else if(dataLabels[code[i].first[j]] != 0){
-                code[i].first[j] = to_string(dataLabels[code[i].first[j]]);
+        code[i].second += offsetLineNum;
+        if(code[i].first[0] == "li" || code[i].first[0] == "lw" || code[i].first[0] == "la"){
+            offsetLineNum += 4;
+            for(int j=1; j<code[i].first.size(); j++){
+                if(textLabels[code[i].first[j]] != 0){
+                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second);
+                }else if(dataLabels[code[i].first[j]] != 0){
+                    code[i].first[j] = to_string(dataLabels[code[i].first[j]]);
+                }
             }
+        }else{
+            for(int j=0; j<code[i].first.size(); j++){
+                if(textLabels[code[i].first[j]] != 0){
+                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second);
+                }else if(dataLabels[code[i].first[j]] != 0){
+                    code[i].first[j] = to_string(dataLabels[code[i].first[j]]);
+                }
+            }
+
         }
     }
+
 }
 
 void parser::removeComments(){
@@ -243,11 +259,11 @@ vector<string> parser::convert(bool DorT){      // pass 0 for data instructions,
 
 void parser::print(){
     for(int i=0; i<code.size(); i++){
-        cout << code[i].second << "\t";
+        fout << "0x" << code[i].second << "\t";
         for(int j=0; j<code[i].first.size(); j++){
-            cout << code[i].first[j] << " "; 
+            fout << code[i].first[j] << " "; 
         }
-        cout << "\n";
+        fout << "\n";
     }
 }
 
