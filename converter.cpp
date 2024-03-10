@@ -555,7 +555,7 @@ void converter::assemblytomachine()
                 string x = (val.first)[1].substr(1);
                 int e1 = registerCheck((val.first)[1], val.second, 1);
                 if (e1 == 0)
-                    string rd = tobinary(x, 5);
+                    rd = tobinary(x, 5);
                 x = (val.first)[2].substr(1);
                 int e2 = registerCheck((val.first)[2], val.second, 2);
                 if (e2 == 0)
