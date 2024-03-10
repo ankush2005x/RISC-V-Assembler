@@ -6,13 +6,13 @@ n: .word 10
 
 .text
 main:
-    jal x1 fibonacci
+
     lw x5 F0
-    
+    lw x6 F1    
     lw x7 n
-    
+    jal x1 fibonacci    
     beq x0 x0 exit
-    lw x6 F1
+
     
 fibonacci:
     blt x7 x0 returnNull
