@@ -5,6 +5,8 @@ using namespace std;
 
 extern ofstream fout;
 // extern ofstream fout for writing to output.mc file.
+
+// parser constructor for parsing the input file and storing the data and text segments in dataCode and code respectively.
 parser::parser(string path){
     fileInput.open(path);
     // fileInput.open for reading the input file.
@@ -65,6 +67,9 @@ parser::parser(string path){
         if(!instruction.empty()){
             code.push_back({instruction, lineNum});
             lineNum+=4;
+            if(instruction.size()==3 && (instruction[0] == "li" || instruction[0] == "lw" || instruction[0] == "la")){
+                lineNum += 4;
+            }
         }
         
     }
@@ -73,7 +78,8 @@ parser::parser(string path){
     replaceReg();
     fileInput.close();
 }
-// parser constructor for parsing the input file and storing the data and text segments in dataCode and code respectively.
+
+// handleData function for identifying data type of data segment instructions.
 void parser::handleData(){
     for (auto dataLine : dataCode){
         if (dataLine[1] == ".word")
@@ -92,7 +98,8 @@ void parser::handleData(){
         }
     }
 }
-// handleData function for storing the data instructions in the dataLabels map.
+
+// storeData function for storing the data instructions in the dataLabels map.
 void parser::storeData(vector<string> dataLine, int increase){
     dataLabels[dataLine[0]] = dataLoc;
     for (int i = 2; i < dataLine.size(); i++){
@@ -100,37 +107,39 @@ void parser::storeData(vector<string> dataLine, int increase){
         dataLoc += increase;
     }
 }
-// storeData function for storing the data instructions in the dataLabels map.
+
+// labelToOffset function for converting the labels to offsets in the text instructions and the addresses in data instructions.
 void parser::labelToOffset(){
-    int offsetLineNum = 0;
+    //int offsetLineNum = 0;
     for(int i=0; i<code.size(); i++){
-        code[i].second += offsetLineNum;
-        if(code[i].first[0] == "li"){
-            offsetLineNum += 4;
-        }else if(code[i].first[0] == "lw" || code[i].first[0] == "la"){
-            for(int j=1; j<code[i].first.size(); j++){
-                if(textLabels[code[i].first[j]] != 0){
-                    offsetLineNum += 4;
-                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second + offsetLineNum);
-                }else if(dataLabels[code[i].first[j]] != 0){
-                    offsetLineNum += 4;
-                    code[i].first[j] = to_string(dataLabels[code[i].first[j]]);
-                }
-            }
-        }else{
+        // code[i].second += offsetLineNum;
+        // if(code[i].first[0] == "li"){
+        //     offsetLineNum += 4;
+        // }else if(code[i].first[0] == "lw" || code[i].first[0] == "la"){
+        //     for(int j=1; j<code[i].first.size(); j++){
+        //         if(textLabels[code[i].first[j]] != 0){
+        //             offsetLineNum += 4;
+        //             code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second + offsetLineNum);
+        //         }else if(dataLabels[code[i].first[j]] != 0){
+        //             offsetLineNum += 4;
+        //             code[i].first[j] = to_string(dataLabels[code[i].first[j]]);
+        //         }
+        //     }
+        // }else{
             for(int j=0; j<code[i].first.size(); j++){
                 if(textLabels[code[i].first[j]] != 0){
-                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second + offsetLineNum);
+                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second);// + offsetLineNum);
                 }else if(dataLabels[code[i].first[j]] != 0){
                     code[i].first[j] = to_string(dataLabels[code[i].first[j]]);
                 }
             }
 
-        }
+        // }
     }
 
 }
-// labelToOffset function for converting the labels to offsets in the text instructions.
+
+// replaceReg function for replacing alternate names(ra, sp, t0...) with register numbers(x0, x1, x2...) in the text instructions.
 void parser::replaceReg(){
     for(int i=0; i<code.size(); i++){
         for(int j=0; j<code[i].first.size(); j++){
@@ -140,7 +149,8 @@ void parser::replaceReg(){
         }
     }
 }
-// replaceReg function for replacing the registers with their respective numbers in the text instructions.
+
+// removeComments function for removing the comments from the input file.
 void parser::removeComments(){
     for(int i=0; i<(int)line.size(); i++){
 
@@ -151,7 +161,8 @@ void parser::removeComments(){
     }
 
 }
-// removeComments function for removing the comments from the input file.
+
+// Character_Check function for checking if the characters in the instruction are valid or not.
 void parser::Character_Check(string word, int lineNum){
     for(auto x: word){
         if((x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z') || (x>='0' && x<='9') || x == '-'){
@@ -164,17 +175,19 @@ void parser::Character_Check(string word, int lineNum){
     }
     return;
 }
-// Character_Check function for checking if the characters in the instruction are valid or not.
+
 void parser::Label_Error(int lineNum){
     error = 1;
     raiseError = "Invalid Label Naming. \nLine number: " + to_string(lineNum);
 }
-//  Label_Error function for checking if the label naming is valid or not.
+
+// Function for throwing error if label already exists.
 void parser::Label_Exists_Error(int lineNum){
     error = 1;
     raiseError = "Duplicate Labels Not Allowed. \nLine number: " + to_string(lineNum);
 }
-// Label_Exists_Error function for checking if the label already exists or not.
+
+// strip function for removing the leading and trailing whitespaces from the lines of input file.
 void parser::strip(){
     int start = 0;
     int end = (int)line.size();
@@ -197,7 +210,8 @@ void parser::strip(){
     }
     
 }
-// strip function for removing the leading and trailing whitespaces from the input file.
+
+//converts the instuction lines to a vector of tokens (that are strings).
 vector<string> parser::convert(bool DorT){      // pass 0 for data instructions, 1 for text instructions.
     vector<string> instruction; 
     string word;
@@ -274,7 +288,6 @@ vector<string> parser::convert(bool DorT){      // pass 0 for data instructions,
 
 
     return instruction;
-    
 }
 
 void parser::print(){
@@ -286,4 +299,3 @@ void parser::print(){
         fout << "\n";
     }
 }
-
