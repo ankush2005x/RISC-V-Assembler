@@ -99,19 +99,22 @@ void parser::labelToOffset(){
     int offsetLineNum = 0;
     for(int i=0; i<code.size(); i++){
         code[i].second += offsetLineNum;
-        if(code[i].first[0] == "li" || code[i].first[0] == "lw" || code[i].first[0] == "la"){
+        if(code[i].first[0] == "li"){
             offsetLineNum += 4;
+        }else if(code[i].first[0] == "lw" || code[i].first[0] == "la"){
             for(int j=1; j<code[i].first.size(); j++){
                 if(textLabels[code[i].first[j]] != 0){
-                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second);
+                    offsetLineNum += 4;
+                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second + offsetLineNum);
                 }else if(dataLabels[code[i].first[j]] != 0){
+                    offsetLineNum += 4;
                     code[i].first[j] = to_string(dataLabels[code[i].first[j]]);
                 }
             }
         }else{
             for(int j=0; j<code[i].first.size(); j++){
                 if(textLabels[code[i].first[j]] != 0){
-                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second);
+                    code[i].first[j] = to_string(textLabels[code[i].first[j]] - code[i].second + offsetLineNum);
                 }else if(dataLabels[code[i].first[j]] != 0){
                     code[i].first[j] = to_string(dataLabels[code[i].first[j]]);
                 }

@@ -15,8 +15,9 @@ int main()
         return 1;
     }
     tokens.print();
+    fout.close();
     converter obj(tokens.code);
     obj.assemblytomachine();
-    fout.close();
+    
     return 0;
 }
