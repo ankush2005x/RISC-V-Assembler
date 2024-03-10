@@ -66,6 +66,7 @@ parser::parser(string path){
         
     }
     labelToOffset();
+    replaceReg();
     fileInput.close();
 }
 
@@ -123,6 +124,16 @@ void parser::labelToOffset(){
         }
     }
 
+}
+
+void parser::replaceReg(){
+    for(int i=0; i<code.size(); i++){
+        for(int j=0; j<code[i].first.size(); j++){
+            if(regMap.find(code[i].first[j])!=regMap.end()){
+                code[i].first[j] = regMap[code[i].first[j]];
+            }
+        }
+    }
 }
 
 void parser::removeComments(){
