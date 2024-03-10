@@ -261,12 +261,15 @@ int converter::immCheck(string x, int line, int pos)
         {
             if (x[i] >= '0' and x[i] <= '9')
             {
+                continue;
             }
             else if (x[i] >= 'A' and x[i] <= 'F')
             {
+                continue;
             }
             else if (x[i] >= 'a' and x[i] <= 'f')
             {
+                continue;
             }
             else
             {
@@ -288,6 +291,7 @@ int converter::immCheck(string x, int line, int pos)
         {
             if (x[i] == '0' or x[i] == '1')
             {
+                continue;
             }
             else
             {
@@ -309,6 +313,7 @@ int converter::immCheck(string x, int line, int pos)
         {
             if (x[i] >= '0' and x[i] <= '7')
             {
+                continue;
             }
             else
             {
@@ -328,6 +333,7 @@ int converter::immCheck(string x, int line, int pos)
         {
             if (x[i] >= '0' and x[i] <= '9')
             {
+                continue;
             }
             else
             {
