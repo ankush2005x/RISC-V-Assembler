@@ -410,7 +410,7 @@ int converter::immBoundCheck(string x, int len, int line, int pos)
                 num = -1 * num;
             }
         }
-        if (num > pow(2, len - 1) - 1 or num < -1 * pow(2, len - 1))
+        if (num > pow(2, len) - 1 or num < -1 * pow(2, len))
         {
             errorGenerator.push_back(pair<int, string>(line, "Immediate out of range at argument " + to_string(pos)));
             return 1;
@@ -425,9 +425,207 @@ void converter::noOfArgumentsError(int line, int n, string x)
 {
     errorGenerator.push_back(pair<int, string>(line, "Number of arguments for instruction " + x + " is not equal to " + to_string(n)));
 }
+
+void converter::basicConverter(pair<vector<string>, int> val)
+{
+    string machineCodeBin = "";
+    string y = (val.first)[0];
+    string rd = "", r1 = "", r2 = "", imm = "";
+    if (m[y] == 1) // 1 for r type
+    {
+        if (val.first.size() - 1 != 3)
+            noOfArgumentsError(val.second, 3, y);
+        else
+        {
+            string opc = mo73[y][0];
+            string x = (val.first)[1].substr(1);
+            int e1 = registerCheck((val.first)[1], val.second, 1);
+            if (e1 == 0)
+                rd = tobinary(x, 5);
+            x = (val.first)[2].substr(1);
+            int e2 = registerCheck((val.first)[2], val.second, 2);
+            if (e2 == 0)
+                r1 = tobinary(x, 5);
+            string fxn7 = mo73[y][1];
+            string fxn3 = mo73[y][2];
+            x = (val.first)[3].substr(1);
+            int e3 = registerCheck((val.first)[3], val.second, 3);
+            if (e3 == 0)
+                r2 = tobinary(x, 5);
+            if (e1 == 0 and e2 == 0 and e3 == 0)
+                machineCodeBin = fxn7 + r2 + r1 + fxn3 + rd + opc;
+        }
+    }
+    else if (m[y] == 2) // 2 for I type with imm after rs1
+    {
+        if (val.first.size() - 1 != 3)
+            noOfArgumentsError(val.second, 3, y);
+        else
+        {
+            string opc = mo73[y][0];
+            string x = (val.first)[1].substr(1);
+            int e1 = registerCheck((val.first)[1], val.second, 1);
+            if (e1 == 0)
+                rd = tobinary(x, 5);
+            x = (val.first)[2].substr(1);
+            int e2 = registerCheck((val.first)[2], val.second, 2);
+            if (e2 == 0)
+                r1 = tobinary(x, 5);
+            string fxn3 = mo73[y][1];
+            x = (val.first)[3];
+            int e3 = immCheck(x, val.second, 3);
+            int e4 = 0;
+            if (e3 == 0)
+            {
+                imm = binCheck(x, 12);
+                e4 = immBoundCheck(x, 12, val.second, 3);
+            }
+            if (e1 == 0 and e2 == 0 and e3 == 0 and e4 == 0)
+                machineCodeBin = imm + r1 + fxn3 + rd + opc;
+        }
+    }
+    else if (m[y] == 3) // 3 for I type with imm before rs1
+    {
+        if (val.first.size() - 1 != 3)
+            noOfArgumentsError(val.second, 3, y);
+        else
+        {
+            string opc = mo73[y][0];
+            string x = (val.first)[1].substr(1);
+            int e1 = registerCheck((val.first)[1], val.second, 1);
+            if (e1 == 0)
+                rd = tobinary(x, 5);
+            x = (val.first)[2];
+            int e4 = 0;
+            int e2 = immCheck(x, val.second, 2);
+            if (e2 == 0)
+            {
+                imm = binCheck(x, 12);
+                e4 = immBoundCheck(x, 12, val.second, 2);
+            }
+            x = (val.first)[3].substr(1);
+            int e3 = registerCheck((val.first)[3], val.second, 3);
+            if (e3 == 0)
+                r1 = tobinary(x, 5);
+            string fxn3 = mo73[y][1];
+            if (e1 == 0 and e2 == 0 and e3 == 0 and e4 == 0)
+                machineCodeBin = imm + r1 + fxn3 + rd + opc;
+        }
+    }
+    else if (m[y] == 4) // 4 for S type
+    {
+        if (val.first.size() - 1 != 3)
+            noOfArgumentsError(val.second, 3, y);
+        else
+        {
+            string opc = mo73[y][0];
+            string x = (val.first)[1].substr(1);
+            int e1 = registerCheck((val.first)[1], val.second, 1);
+            if (e1 == 0)
+                r1 = tobinary(x, 5);
+            x = (val.first)[2];
+            int e4 = 0;
+            int e2 = immCheck(x, val.second, 2);
+            if (e2 == 0)
+            {
+                imm = binCheck(x, 12);
+                e4 = immBoundCheck(x, 12, val.second, 2);
+            }
+            x = (val.first)[3].substr(1);
+            int e3 = registerCheck((val.first)[3], val.second, 3);
+            if (e3 == 0)
+                r2 = tobinary(x, 5);
+            string fxn3 = mo73[y][1];
+            if (e1 == 0 and e2 == 0 and e3 == 0 and e4 == 0)
+                machineCodeBin = imm.substr(0, 7) + r1 + r2 + fxn3 + imm.substr(7, 5) + opc;
+        }
+    }
+    else if (m[y] == 5) // 5 for SB type
+    {
+        if (val.first.size() - 1 != 3)
+            noOfArgumentsError(val.second, 3, y);
+        else
+        {
+            string opc = mo73[y][0];
+            string x = (val.first)[1].substr(1);
+            int e1 = registerCheck((val.first)[1], val.second, 1);
+            if (e1 == 0)
+                r1 = tobinary(x, 5);
+            x = (val.first)[2].substr(1);
+            int e2 = registerCheck((val.first)[2], val.second, 2);
+            if (e2 == 0)
+                r2 = tobinary(x, 5);
+            x = (val.first)[3];
+            int e4 = 0;
+            int e3 = immCheck(x, val.second, 3);
+            if (e3 == 0)
+            {
+                imm = binCheck(x, 13);
+                e4 = immBoundCheck(x, 13, val.second, 3);
+            }
+            string fxn3 = mo73[y][1];
+            if (e1 == 0 and e2 == 0 and e3 == 0 and e4 == 0)
+                machineCodeBin = imm.substr(0, 1) + imm.substr(2, 6) + r2 + r1 + fxn3 + imm.substr(8, 4) + imm.substr(1, 1) + opc;
+        }
+    }
+    else if (m[y] == 6) // 6 for U type
+    {
+        if (val.first.size() - 1 != 2)
+            noOfArgumentsError(val.second, 2, y);
+        else
+        {
+            string opc = mo73[y][0];
+            string x = (val.first)[1].substr(1);
+            int e1 = registerCheck((val.first)[1], val.second, 1);
+            if (e1 == 0)
+                rd = tobinary(x, 5);
+            x = (val.first)[2];
+            int e2 = immCheck(x, val.second, 2);
+            int e4 = 0;
+            if (e2 == 0)
+            {
+                imm = binCheck(x, 20);
+                e4 = immBoundCheck(x, 20, val.second, 2);
+            }
+            if (e1 == 0 and e2 == 0 and e4 == 0)
+                machineCodeBin = imm + rd + opc;
+        }
+    }
+    else if (m[y] == 7) // 7 for UJ type
+    {
+        if (val.first.size() - 1 != 2)
+            noOfArgumentsError(val.second, 2, y);
+        else
+        {
+            string opc = mo73[y][0];
+            string x = (val.first)[1].substr(1);
+            int e1 = registerCheck((val.first)[1], val.second, 1);
+            if (e1 == 0)
+                rd = tobinary(x, 5);
+            x = (val.first)[2];
+            int e4 = 0;
+            int e2 = immCheck(x, val.second, 2);
+            if (e2 == 0)
+            {
+                imm = binCheck(x, 21);
+                e4 = immBoundCheck(x, 21, val.second, 2);
+            }
+            if (e1 == 0 and e2 == 0 and e4 == 0)
+                machineCodeBin = imm.substr(0, 1) + imm.substr(10, 10) + imm.substr(9, 1) + imm.substr(1, 8) + rd + opc;
+        }
+    }
+    else
+    {
+        errorGenerator.push_back(pair<int, string>(val.second, "Instruction not recognized"));
+        return;
+    }
+    string machineCodeHex = bintoHex(machineCodeBin);
+    std::cout << "0x" << std::hex << val.second;
+    std::cout << "\t" << machineCodeHex << "\n";
+}
+
 void converter::assemblytomachine()
 {
-    map<string, int> m;
     m["add"] = 1;
     m["and"] = 1;
     m["or"] = 1;
@@ -465,7 +663,6 @@ void converter::assemblytomachine()
     m["lui"] = 6;
     // UJ type
     m["jal"] = 7;
-    map<string, vector<string>> mo73; // opcode fxn 7 and fxn 3
     // R type
     mo73["add"].push_back("0110011");
     mo73["and"].push_back("0110011");
@@ -548,200 +745,62 @@ void converter::assemblytomachine()
     mo73["jal"].push_back("1101111");
     for (auto val : code)
     {
-        string machineCodeBin = "";
         string y = (val.first)[0];
-        string rd = "", r1 = "", r2 = "", imm = "";
-        if (m[y] == 1) // 1 for r type
+        if (y == "lw")
         {
-            if (val.first.size() - 1 != 3)
-                noOfArgumentsError(val.second, 3, y);
-            else
+            if ((val.first).size() == 3)
             {
-                string opc = mo73[y][0];
-                string x = (val.first)[1].substr(1);
-                int e1 = registerCheck((val.first)[1], val.second, 1);
-                if (e1 == 0)
-                    rd = tobinary(x, 5);
-                x = (val.first)[2].substr(1);
-                int e2 = registerCheck((val.first)[2], val.second, 2);
-                if (e2 == 0)
-                    r1 = tobinary(x, 5);
-                string fxn7 = mo73[y][1];
-                string fxn3 = mo73[y][2];
-                x = (val.first)[3].substr(1);
-                int e3 = registerCheck((val.first)[3], val.second, 3);
-                if (e3 == 0)
-                    r2 = tobinary(x, 5);
-                if (e1 == 0 and e2 == 0 and e3 == 0)
-                    machineCodeBin = fxn7 + r2 + r1 + fxn3 + rd + opc;
-            }
-        }
-        else if (m[y] == 2) // 2 for I type with imm after rs1
-        {
-            if (val.first.size() - 1 != 3)
-                noOfArgumentsError(val.second, 3, y);
-            else
-            {
-                string opc = mo73[y][0];
-                string x = (val.first)[1].substr(1);
-                int e1 = registerCheck((val.first)[1], val.second, 1);
-                if (e1 == 0)
-                    rd = tobinary(x, 5);
-                x = (val.first)[2].substr(1);
-                int e2 = registerCheck((val.first)[2], val.second, 2);
-                if (e2 == 0)
-                    r1 = tobinary(x, 5);
-                string fxn3 = mo73[y][1];
-                x = (val.first)[3];
-                int e3 = immCheck(x, val.second, 3);
-                int e4 = 0;
-                if (e3 == 0)
+                int address = stoi((val.first)[2]);
+                int first20 = (address >> 12) & ((1 << 20) - 1);
+                int last12 = (address & ((1 << 12) - 1));
+                if (last12 > (1 << 11) - 1)
                 {
-                    imm = binCheck(x, 12);
-                    e4 = immBoundCheck(x, 12, val.second, 3);
+                    last12 -= (1 << 12);
+                    first20 += 1;
                 }
-                if (e1 == 0 and e2 == 0 and e3 == 0 and e4 == 0)
-                    machineCodeBin = imm + r1 + fxn3 + rd + opc;
+                vector<string> temp = {"auipc", (val.first)[1], "65536"};
+                basicConverter(pair<vector<string>, int>(temp, val.second));
+                // instruction_convert({{"auipc", (val.first)[1], to_string(first20)}, val.second});
+                basicConverter({{"lw", (val.first)[1], to_string(stoll((val.first)[2]) - 268435456 - val.second), (val.first)[1]}, val.second + 4});
+                // instruction_convert({{"lw", (val.first)[1], to_string(last12), (val.first)[1]}, val.second + 4});
             }
-        }
-        else if (m[y] == 3) // 3 for I type with imm before rs1
-        {
-            if (val.first.size() - 1 != 3)
-                noOfArgumentsError(val.second, 3, y);
+
             else
-            {
-                string opc = mo73[y][0];
-                string x = (val.first)[1].substr(1);
-                int e1 = registerCheck((val.first)[1], val.second, 1);
-                if (e1 == 0)
-                    rd = tobinary(x, 5);
-                x = (val.first)[2];
-                int e4 = 0;
-                int e2 = immCheck(x, val.second, 2);
-                if (e2 == 0)
-                {
-                    imm = binCheck(x, 12);
-                    e4 = immBoundCheck(x, 12, val.second, 2);
-                }
-                x = (val.first)[3].substr(1);
-                int e3 = registerCheck((val.first)[3], val.second, 3);
-                if (e3 == 0)
-                    r1 = tobinary(x, 5);
-                string fxn3 = mo73[y][1];
-                if (e1 == 0 and e2 == 0 and e3 == 0 and e4 == 0)
-                    machineCodeBin = imm + r1 + fxn3 + rd + opc;
-            }
+                basicConverter(val);
         }
-        else if (m[y] == 4) // 4 for S type
+        else if (y == "la")
         {
-            if (val.first.size() - 1 != 3)
-                noOfArgumentsError(val.second, 3, y);
-            else
+            int address = stoi((val.first)[2]);
+
+            int first20 = (address >> 12) & ((1 << 20) - 1);
+            int last12 = (address & ((1 << 12) - 1));
+            if (last12 > (1 << 11) - 1)
             {
-                string opc = mo73[y][0];
-                string x = (val.first)[1].substr(1);
-                int e1 = registerCheck((val.first)[1], val.second, 1);
-                if (e1 == 0)
-                    r1 = tobinary(x, 5);
-                x = (val.first)[2];
-                int e4 = 0;
-                int e2 = immCheck(x, val.second, 2);
-                if (e2 == 0)
-                {
-                    imm = binCheck(x, 12);
-                    e4 = immBoundCheck(x, 12, val.second, 2);
-                }
-                x = (val.first)[3].substr(1);
-                int e3 = registerCheck((val.first)[3], val.second, 3);
-                if (e3 == 0)
-                    r2 = tobinary(x, 5);
-                string fxn3 = mo73[y][1];
-                if (e1 == 0 and e2 == 0 and e3 == 0 and e4 == 0)
-                    machineCodeBin = imm.substr(0, 7) + r1 + r2 + fxn3 + imm.substr(7, 5) + opc;
+                last12 -= (1 << 12);
+                first20 += 1;
             }
+            // cout << address << " " << first20 << " " << last12 << " " << (stoll((val.first)[2]) - 268435456 - val.second) << "\n";
+            basicConverter({{"auipc", (val.first)[1], to_string(first20)}, val.second});
+            // instruction_convert({{"addi", (val.first)[1], val.first[1], to_string(stoll((val.first)[2]) - 268435456 - val.second)}, val.second + 4});
+            basicConverter({{"addi", (val.first)[1], val.first[1], to_string(last12)}, val.second + 4});
         }
-        else if (m[y] == 5) // 5 for SB type
+        else if (y == "li")
         {
-            if (val.first.size() - 1 != 3)
-                noOfArgumentsError(val.second, 3, y);
-            else
+            int value = stoi((val.first)[2]);
+
+            int first20 = (value >> 12) & ((1 << 20) - 1);
+            int last12 = (value & ((1 << 12) - 1));
+            if (last12 > (1 << 11) - 1)
             {
-                string opc = mo73[y][0];
-                string x = (val.first)[1].substr(1);
-                int e1 = registerCheck((val.first)[1], val.second, 1);
-                if (e1 == 0)
-                    r1 = tobinary(x, 5);
-                x = (val.first)[2].substr(1);
-                int e2 = registerCheck((val.first)[2], val.second, 2);
-                if (e2 == 0)
-                    r2 = tobinary(x, 5);
-                x = (val.first)[3];
-                int e4 = 0;
-                int e3 = immCheck(x, val.second, 3);
-                if (e3 == 0)
-                {
-                    imm = binCheck(x, 13);
-                    e4 = immBoundCheck(x, 13, val.second, 3);
-                }
-                string fxn3 = mo73[y][1];
-                if (e1 == 0 and e2 == 0 and e3 == 0 and e4 == 0)
-                    machineCodeBin = imm.substr(0, 1) + imm.substr(2, 6) + r2 + r1 + fxn3 + imm.substr(8, 4) + imm.substr(1, 1) + opc;
+                last12 -= (1 << 12);
+                first20 += 1;
             }
-        }
-        else if (m[y] == 6) // 6 for U type
-        {
-            if (val.first.size() - 1 != 2)
-                noOfArgumentsError(val.second, 2, y);
-            else
-            {
-                string opc = mo73[y][0];
-                string x = (val.first)[1].substr(1);
-                int e1 = registerCheck((val.first)[1], val.second, 1);
-                if (e1 == 0)
-                    rd = tobinary(x, 5);
-                x = (val.first)[2];
-                int e2 = immCheck(x, val.second, 2);
-                int e4 = 0;
-                if (e2 == 0)
-                {
-                    imm = binCheck(x, 20);
-                    e4 = immBoundCheck(x, 20, val.second, 2);
-                }
-                if (e1 == 0 and e2 == 0 and e4 == 0)
-                    machineCodeBin = imm + rd + opc;
-            }
-        }
-        else if (m[y] == 7) // 7 for UJ type
-        {
-            if (val.first.size() - 1 != 2)
-                noOfArgumentsError(val.second, 2, y);
-            else
-            {
-                string opc = mo73[y][0];
-                string x = (val.first)[1].substr(1);
-                int e1 = registerCheck((val.first)[1], val.second, 1);
-                if (e1 == 0)
-                    rd = tobinary(x, 5);
-                x = (val.first)[2];
-                int e4 = 0;
-                int e2 = immCheck(x, val.second, 2);
-                if (e2 == 0)
-                {
-                    imm = binCheck(x, 21);
-                    e4 = immBoundCheck(x, 21, val.second, 2);
-                }
-                if (e1 == 0 and e2 == 0 and e4 == 0)
-                    machineCodeBin = imm.substr(0, 1) + imm.substr(10, 10) + imm.substr(9, 1) + imm.substr(1, 8) + rd + opc;
-            }
+            cout << first20 << "\n";
+            basicConverter({{"lui", (val.first)[1], to_string(first20)}, val.second});
+            basicConverter({{"addi", (val.first)[1], val.first[1], to_string(last12)}, val.second + 4});
         }
         else
-        {
-            errorGenerator.push_back(pair<int, string>(val.second, "Instruction not recognized"));
-            continue;
-        }
-        string machineCodeHex = bintoHex(machineCodeBin);
-        std::cout << "0x" << std::hex << val.second;
-        std::cout << "\t" << machineCodeHex << "\n";
+            basicConverter(val);
     }
     if (errorGenerator.size() > 0)
     {
