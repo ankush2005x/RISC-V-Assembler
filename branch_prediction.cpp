@@ -3,7 +3,7 @@ using namespace std;
 
 #include "branch_prediction.h"
 
-branch_prediction::branch_prediction(vector<vector<string>> code, int choice)
+branch_prediction::branch_prediction(vector<vector<string>> code)
 {
     last_pc = 0;
     offset = 0;
@@ -12,13 +12,20 @@ branch_prediction::branch_prediction(vector<vector<string>> code, int choice)
     correct_predicted = 0;
     for (auto val : code)
     {
-        switch (choice)
-        {
-        case 1:
-        case 2:
-            branch(val, choice);
-            break;
-        }
+        branch(val, 1);
+    }
+    cout << "BRANCH ALWAYS TAKEN" << endl;
+    if (total_predicted != 0)
+        cout << "accuracy when the branch is always taken : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << endl;
+    else
+        cout << "No branches are present in the code" << endl;
+
+    total_predicted = 0;
+    correct_predicted = 0;
+    cout << "BRANCH ALWAYS NOT TAKEN" << endl;
+    for (auto val : code)
+    {
+        branch(val, 2);
     }
     if (total_predicted != 0)
         cout << "accuracy when the branch is always taken : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << endl;
