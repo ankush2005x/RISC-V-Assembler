@@ -24,20 +24,22 @@ int main()
         cout << "Wrong Option Selected. Code Exited.\n";
         return 1;
     }
-    fout << "Data Segment Memory: \n";
     parser tokens(path, mode);
-    if (tokens.error == 1)
-    {
-        fout << tokens.raiseError << "\n";
-        return 1;
-    }
-
-    fout << "\n\nAssembly Instructions:\n";
-    tokens.print(mode);
-
-    fout << "\n\nMachine Code:\n";
 
     if(mode == 1){
+        cout << "Check output.mc file! \n";
+        fout << "Data Segment Memory: \n";
+
+        if (tokens.error == 1)
+        {
+            fout << tokens.raiseError << "\n";
+            return 1;
+        }
+
+        fout << "\n\nAssembly Instructions:\n";
+        tokens.print(mode);
+
+        fout << "\n\nMachine Code:\n";        
         converter obj(tokens.code);
         obj.assemblytomachine();
     }else{

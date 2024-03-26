@@ -20,13 +20,15 @@ private:
     bool last_instr;
     bool error = false;
     long long hexatodec(string);
-
+    
     void branch(vector<string>, int choice);
+    void print(int choice);
 
 public:
     branch_prediction(vector<vector<string>>);
     long long total_predicted;
     long long correct_predicted;
-    map<long long, pair<long long, pair<int, int>>> BTB;
+    map<long long, tuple<long long, pair<int, int>, int, int>> BTB;
+    map<long long, vector<pair<int, int>>> BH;    
 };
 #endif
