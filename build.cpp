@@ -13,7 +13,6 @@ int main()
     int mode;
     cin >> mode;
 
-
     fout.open("output.mc");
     string path;
     if(mode == 1){
@@ -25,6 +24,7 @@ int main()
         return 1;
     }
     parser tokens(path, mode);
+
 
     if(mode == 1){
         cout << "Check output.mc file! \n";
