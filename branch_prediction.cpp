@@ -28,7 +28,27 @@ branch_prediction::branch_prediction(vector<vector<string>> code, int choice)
 void branch_prediction::branch(vector<string> line, int choice)
 {
     string this_instr = line[4];
-    if (last_instr == "beq" || last_instr == "bne" || last_instr == "blt" || last_instr == "bge" || this_instr == "jal")
+    bool instr_check = false;
+    vector<string> branch_instructions = {
+        "beq",
+        "beqz",
+        "bne",
+        "blt",
+        "bge",
+        "bltu",
+        "bgeu",
+        "bnez",
+        "bneu",
+        "jal"};
+    for (auto val : branch_instructions)
+    {
+        if (last_instr == val)
+        {
+            instr_check = true;
+            break;
+        }
+    }
+    if (instr_check == true)
     {
         total_predicted++;
         int this_pc = hexatodec(line[2]);
@@ -47,19 +67,31 @@ void branch_prediction::branch(vector<string> line, int choice)
             }
         }
     }
-    if (this_instr == "beq" || this_instr == "bne" || this_instr == "blt" || this_instr == "bge")
+    instr_check = false;
+    for (auto val : branch_instructions)
     {
-        int offset = stoi(line[7]);
-        last_pc = hexatodec(line[2]);
+        if (last_instr == val)
+        {
+            instr_check = true;
+            break;
+        }
     }
-    else if (this_instr == "jal")
+    if (instr_check == true)
     {
-        int offset = stoi(line[6]);
-        last_pc = hexatodec(line[2]);
+        if (this_instr == "jal")
+        {
+            offset = stoi(line[6]);
+            last_pc = hexatodec(line[2]);
+        }
+        else
+        {
+            offset = stoi(line[7]);
+            last_pc = hexatodec(line[2]);
+        }
     }
     last_instr = this_instr;
 }
-int branch_prediction::hexatodec(string hexVal)
+long long branch_prediction::hexatodec(string hexVal)
 {
     if (hexVal.substr(0, 2) == "0x")
         hexVal = hexVal.substr(0, 2);
@@ -68,7 +100,7 @@ int branch_prediction::hexatodec(string hexVal)
     // Initializing base value to 1, i.e 16^0
     int base = 1;
 
-    int dec_val = 0;
+    long long dec_val = 0;
     for (int i = len - 1; i >= 0; i--)
     {
         if (hexVal[i] >= '0' && hexVal[i] <= '9')

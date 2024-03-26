@@ -24,6 +24,6 @@ public:
     void branch(vector<string>, int choice);
     long long total_predicted;
     long long correct_predicted;
-    int hexatodec(string);
+    long long hexatodec(string);
 };
 #endif
