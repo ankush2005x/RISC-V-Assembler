@@ -15,42 +15,36 @@ int main()
 
     fout.open("output.mc");
     string path;
-    if (mode == 1)
-    {
+    if(mode == 1){
         path = "assembly.s";
-    }
-    else if (mode == 2)
-    {
+    }else if(mode == 2){
         path = "trace.s";
-    }
-    else
-    {
+    }else{
         cout << "Wrong Option Selected. Code Exited.\n";
         return 1;
     }
     parser tokens(path, mode);
-    
-    if (mode == 1)
-    {
+
+
+    if(mode == 1){
+        cout << "Check output.mc file! \n";
         fout << "Data Segment Memory: \n";
-        
+
         if (tokens.error == 1)
         {
             fout << tokens.raiseError << "\n";
             return 1;
         }
+
         fout << "\n\nAssembly Instructions:\n";
         tokens.print(mode);
 
-        fout << "\n\nMachine Code:\n";
+        fout << "\n\nMachine Code:\n";        
         converter obj(tokens.code);
         obj.assemblytomachine();
-    }
-    else
-    {
+    }else{
         vector<vector<string>> branchData;
-        for (auto items : tokens.code)
-        {
+        for(auto items: tokens.code){
             branchData.push_back(items.first);
         }
         branch_prediction obj(branchData);
