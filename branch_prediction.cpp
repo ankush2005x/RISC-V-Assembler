@@ -27,31 +27,38 @@ branch_prediction::branch_prediction(vector<vector<string>> code, int choice)
 }
 void branch_prediction::branch(vector<string> line, int choice)
 {
-    string this_instr = line[4];
-    bool instr_check = false;
-    vector<string> branch_instructions = {
-        "beq",
-        "beqz",
-        "bne",
-        "blt",
-        "bge",
-        "bltu",
-        "bgeu",
-        "bnez",
-        "bneu",
-        "jal"};
-    for (auto val : branch_instructions)
+    bool this_instr = false;
+    if (line.size() == 3)
     {
-        if (last_instr == val)
+        if (line[1] != "jal")
         {
-            instr_check = true;
-            break;
+            this_instr = true;
         }
     }
-    if (instr_check == true)
+    // bool instr_check = false;
+    int this_pc = hexatodec(line[0]);
+    // vector<string> branch_instructions = {
+    //     "beq",
+    //     "beqz",
+    //     "bne",
+    //     "blt",
+    //     "bge",
+    //     "bltu",
+    //     "bgeu",
+    //     "bnez",
+    //     "bneu",
+    //     "jal"};
+    // for (auto val : branch_instructions)
+    // {
+    //     if (last_instr == val)
+    //     {
+    //         instr_check = true;
+    //         break;
+    //     }
+    // }
+    if (last_instr == true)
     {
         total_predicted++;
-        int this_pc = hexatodec(line[2]);
         if (choice == 1)
         {
             if (last_pc + offset == this_pc)
@@ -67,27 +74,23 @@ void branch_prediction::branch(vector<string> line, int choice)
             }
         }
     }
-    instr_check = false;
-    for (auto val : branch_instructions)
+    // instr_check = false;
+    // for (auto val : branch_instructions)
+    // {
+    //     if (last_instr == val)
+    //     {
+    //         instr_check = true;
+    //         break;
+    //     }
+    // }
+    if (line.size() == 3)
     {
-        if (last_instr == val)
+        if (line[1] != "jal")
         {
-            instr_check = true;
-            break;
+            offset = stoi(line[2]);
+            last_pc = hexatodec(line[0]);
         }
-    }
-    if (instr_check == true)
-    {
-        if (this_instr == "jal")
-        {
-            offset = stoi(line[6]);
-            last_pc = hexatodec(line[2]);
-        }
-        else
-        {
-            offset = stoi(line[7]);
-            last_pc = hexatodec(line[2]);
-        }
+        BTB[this_pc] = {this_pc + offset, {-1, -1}};
     }
     last_instr = this_instr;
 }

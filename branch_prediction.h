@@ -19,11 +19,12 @@ public:
     bool error = false;
     int offset;
     int last_pc;
-    string last_instr;
+    bool last_instr;
     branch_prediction(vector<vector<string>>, int choice);
     void branch(vector<string>, int choice);
     long long total_predicted;
     long long correct_predicted;
     long long hexatodec(string);
+    map<int, pair<int, pair<int, int>>> BTB;
 };
 #endif
