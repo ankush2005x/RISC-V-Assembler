@@ -2,6 +2,7 @@
 using namespace std;
 #include "parse.h"
 #include "converter.h"
+#include "branch_prediction.h"
 
 ofstream fout;
 
@@ -40,7 +41,11 @@ int main()
         converter obj(tokens.code);
         obj.assemblytomachine();
     }else{
-        // Satvik add function call for your branch predictor
+        vector<vector<string>> branchData;
+        for(auto items: tokens.code){
+            branchData.push_back(items.first);
+        }
+        branch_prediction obj(branchData);
     }
 
     fout.close();

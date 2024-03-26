@@ -13,18 +13,20 @@ class branch_prediction
 private:
     ifstream fileInput;
     string line;
+    bool oneBit;
+    int twoBit;
+    int offset;
+    long long last_pc;
+    bool last_instr;
+    bool error = false;
+    long long hexatodec(string);
+
+    void branch(vector<string>, int choice);
 
 public:
-    // all the functions to be used are made public
-    bool error = false;
-    int offset;
-    int last_pc;
-    bool last_instr;
     branch_prediction(vector<vector<string>>);
-    void branch(vector<string>, int choice);
     long long total_predicted;
     long long correct_predicted;
-    long long hexatodec(string);
-    map<int, pair<int, pair<int, int>>> BTB;
+    map<long long, pair<long long, pair<int, int>>> BTB;
 };
 #endif

@@ -137,7 +137,7 @@ vector<string> parser::extractPC(string PCpart){
     vector<string> instruction;
     for (int i = 0; i < (int)PCpart.size(); i++)
     {
-        if (PCpart[i] == ':' || PCpart[i] == ' ' || PCpart[i] == '(' || PCpart[i] == ')')
+        if (PCpart[i] == ':' || PCpart[i] == ' ' || PCpart[i] == '(' || PCpart[i] == ')' || "\n")
         {
             if (!word.empty())
             {
