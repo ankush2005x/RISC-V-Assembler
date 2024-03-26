@@ -19,11 +19,11 @@ branch_prediction::branch_prediction(vector<vector<string>> code)
     {
         branch(val, 1);
     }
-    cout << "\nBRANCH ALWAYS TAKEN" << endl;
+    cout << "\nBRANCH ALWAYS TAKEN" << "\n";
     if (total_predicted != 0)
-        cout << "\tAccuracy : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << endl;
+        cout << "\tAccuracy : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << "\n";
     else
-        cout << "\tNo branches are present in the code" << endl;
+        cout << "\tNo branches are present in the code" << "\n";
 
     print(1);
     BTB.clear();
@@ -34,15 +34,15 @@ branch_prediction::branch_prediction(vector<vector<string>> code)
     last_instr = false;
     total_predicted = 0;
     correct_predicted = 0;
-    cout << "\nBRANCH ALWAYS NOT TAKEN" << endl;
+    cout << "\nBRANCH ALWAYS NOT TAKEN" << "\n";
     for (auto val : code)
     {
         branch(val, 2);
     }
     if (total_predicted != 0)
-        cout << "\tAccuracy : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << endl;
+        cout << "\tAccuracy : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << "\n";
     else
-        cout << "\tNo branches are present in the code" << endl;
+        cout << "\tNo branches are present in the code" << "\n";
     
     print(2);
     BTB.clear();
@@ -53,15 +53,15 @@ branch_prediction::branch_prediction(vector<vector<string>> code)
     last_instr = false;    
     total_predicted = 0;
     correct_predicted = 0;
-    cout << "\n1 BIT BRANCH PREDICTOR" << endl;
+    cout << "\n1 BIT BRANCH PREDICTOR" << "\n";
     for (auto val : code)
     {
         branch(val, 3);
     }
     if (total_predicted != 0)
-        cout << "\tAccuracy : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << endl;
+        cout << "\tAccuracy : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << "\n";
     else
-        cout << "\tNo branches are present in the code" << endl;
+        cout << "\tNo branches are present in the code" << "\n";
     
     print(3);
     BTB.clear();
@@ -72,15 +72,15 @@ branch_prediction::branch_prediction(vector<vector<string>> code)
     last_instr = false;    
     total_predicted = 0;
     correct_predicted = 0;
-    cout << "\n2 BIT BRANCH PREDICTOR" << endl;
+    cout << "\n2 BIT BRANCH PREDICTOR" << "\n";
     for (auto val : code)
     {
         branch(val, 4);
     }
     if (total_predicted != 0)
-        cout << "\tAccuracy : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << endl;
+        cout << "\tAccuracy : " << ((correct_predicted * 1.0) / total_predicted) * 100 << "%" << "\n";
     else
-        cout << "\tNo branches are present in the code" << endl;
+        cout << "\tNo branches are present in the code" << "\n";
     
     print(4);
 }
