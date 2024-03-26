@@ -7,7 +7,7 @@ extern ofstream fout;
 // extern ofstream fout for writing to output.mc file.
 
 // parser constructor for parsing the input file and storing the data and text segments in dataCode and code respectively.
-parser::parser(string path)
+parser::parser(string path, int mode = 1)
 {
     fileInput.open(path);
 
@@ -16,89 +16,167 @@ parser::parser(string path)
         error = 1;
         return;
     }
-    bool data = 0;
-    bool text = 0;
-    vector<string> dataSeg;
-    vector<string> textSeg;
-    // dataSeg and textSeg for storing the data and text segments of the input file.
-    while (getline(fileInput, line))
-    {
-        removeComments();
-        strip();
-        if (line.size() != 0)
+    if(mode == 1){
+        bool data = 0;
+        bool text = 0;
+        vector<string> dataSeg;
+        vector<string> textSeg;
+        // dataSeg and textSeg for storing the data and text segments of the input file.
+        while (getline(fileInput, line))
         {
-            if (line.find(".data") == 0)
+            removeComments();
+            strip();
+            if (line.size() != 0)
             {
-                data = 1;
-                text = 0;
-            }
-            else if (line.find(".text") == 0)
-            {
-                data = 0;
-                text = 1;
-            }
-            else
-            {
-                if (line.find(".data") != string::npos)
+                if (line.find(".data") == 0)
                 {
-                    error = 1;
-                    raiseError = "invalid .data position";
+                    data = 1;
+                    text = 0;
                 }
-                else if (line.find(".text") != string::npos)
+                else if (line.find(".text") == 0)
                 {
-                    error = 1;
-                    raiseError = "invalid .text position";
+                    data = 0;
+                    text = 1;
                 }
                 else
                 {
-                    if (data == 1 && text == 0)
+                    if (line.find(".data") != string::npos)
                     {
-                        dataSeg.push_back(line);
+                        error = 1;
+                        raiseError = "invalid .data position";
+                    }
+                    else if (line.find(".text") != string::npos)
+                    {
+                        error = 1;
+                        raiseError = "invalid .text position";
                     }
                     else
                     {
-                        textSeg.push_back(line);
+                        if (data == 1 && text == 0)
+                        {
+                            dataSeg.push_back(line);
+                        }
+                        else
+                        {
+                            textSeg.push_back(line);
+                        }
                     }
                 }
             }
         }
-    }
-    // dataSeg and textSeg are filled with the data and text segments of the input file.
-    for (auto dataLines : dataSeg)
-    {
-        line = dataLines;
-        vector<string> dataInstruction = convert(0);
-        dataCode.push_back(dataInstruction);
-    }
-    // dataCode is filled with the data instructions of the input file.
-    handleData();
-    if (error == 1)
-    {
-        return;
-    }
-    for (auto textLines : textSeg)
-    {
-        line = textLines;
-        vector<string> instruction = convert(1);
-        if (error)
+        // dataSeg and textSeg are filled with the data and text segments of the input file.
+        for (auto dataLines : dataSeg)
+        {
+            line = dataLines;
+            vector<string> dataInstruction = convert(0);
+            dataCode.push_back(dataInstruction);
+        }
+        // dataCode array is filled with the data instructions of the input file.
+        handleData();
+        if (error == 1)
         {
             return;
         }
-        if (!instruction.empty())
+        // code array is filled with the parsed text instructions of the input file.
+        for (auto textLines : textSeg)
         {
-            code.push_back({instruction, lineNum});
-            lineNum += 4;
-            if (instruction.size() == 3 && (instruction[0] == "li" || instruction[0] == "lw" || instruction[0] == "la"))
+            line = textLines;
+            vector<string> instruction = convert(1);
+            if (error)
             {
+                return;
+            }
+            if (!instruction.empty())
+            {
+                code.push_back({instruction, lineNum});
                 lineNum += 4;
+                if (instruction.size() == 3 && (instruction[0] == "li" || instruction[0] == "lw" || instruction[0] == "la"))
+                {
+                    lineNum += 4;
+                }
             }
         }
+
+        labelToOffset();
+        replaceReg();
+        
+    }else{
+        
+        while (getline(fileInput, line)){
+            vector<string> instruction;
+            removeComments();
+            strip();
+            int pcPos = line.find("pc");
+            if(pcPos != string::npos){
+                
+                vector<string> part1 = extractPC(line.substr(0, pcPos));   
+                for(auto word: part1){
+                    instruction.push_back(word);
+                }
+                vector<string> part2 = extractOffset(line.substr(pcPos+2));
+                for(auto word: part2){
+                    instruction.push_back(word);
+                }
+            }else{
+                vector<string> part1 = extractPC(line.substr(0, pcPos));   
+                for(auto word: part1){
+                    instruction.push_back(word);
+                }
+            }
+            code.push_back({instruction, -1});
+        }
     }
-    // code is filled with the text instructions of the input file.
-    labelToOffset();
-    replaceReg();
+
     fileInput.close();
+    
 }
+
+vector<string> parser::extractPC(string PCpart){
+    int cnt = 0;
+    string word;
+    vector<string> instruction;
+    for (int i = 0; i < (int)PCpart.size(); i++)
+    {
+        if (PCpart[i] == ':' || PCpart[i] == ' ' || PCpart[i] == '(' || PCpart[i] == ')')
+        {
+            if (!word.empty())
+            {
+                // when the last word is not empty.
+                
+                if(cnt == 2 || cnt == 4){ // extract PC and instruction type
+                    instruction.push_back(word);
+                }               
+                cnt++;
+                word.clear();
+            }
+        }else{
+            word += PCpart[i];    
+        }
+    }
+    return instruction;
+}
+
+vector<string> parser::extractOffset(string Offsetpart)
+{
+    string word;
+    vector<string> instruction;
+    for (int i = 0; i < (int)Offsetpart.size(); i++)
+    {
+        if (Offsetpart[i] == ' ')
+        {
+            continue;
+        }else{
+            word += Offsetpart[i];    
+        }
+    }
+    if (!word.empty())
+    {
+        instruction.push_back(word);
+        word.clear();
+    }    
+    return instruction;
+}
+
 
 // handleData function for identifying data type of data segment instructions.
 void parser::handleData()
@@ -322,16 +400,22 @@ vector<string> parser::convert(bool DorT)
             }
             else
             {
-                instruction.push_back(word);
-                word.clear();
+                if (!word.empty())
+                {
+                    instruction.push_back(word);
+                    word.clear();
+                }
             }
         }
         else if (line[i] == ')' && DorT == 1)
         {
             if (i == line.size() - 1)
             {
-                instruction.push_back(word);
-                word.clear();
+                if (!word.empty())
+                {
+                    instruction.push_back(word);
+                    word.clear();
+                }
             }
             else
             {
@@ -369,11 +453,11 @@ vector<string> parser::convert(bool DorT)
     return instruction;
 }
 
-void parser::print()
+void parser::print(int mode = 1)
 {
     for (int i = 0; i < code.size(); i++)
     {
-        fout << "0x" << code[i].second << "\t";
+        if(mode == 1) fout << "0x" << code[i].second << "\t";
         for (int j = 0; j < code[i].first.size(); j++)
         {
             fout << code[i].first[j] << " ";

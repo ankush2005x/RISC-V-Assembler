@@ -13,6 +13,10 @@ private:
 
     int dataLoc = 268435456;         //0x10000000
     // all functions to be used in the constructor
+
+    vector<string> extractPC(string);             //  For Branch Table Mode
+    vector<string> extractOffset(string);         //
+
     void removeComments();
     void strip();
     void Character_Check(string word, int lineNum);
@@ -68,8 +72,8 @@ public:
     bool error = false;
     string raiseError;
     // constructor
-    parser(string path);
-    void print();
+    parser(string path, int mode);
+    void print(int mode);
 };
 
 
