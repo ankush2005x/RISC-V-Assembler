@@ -1,7 +1,7 @@
 # RISC-V-Assembler in C++
 
 For Compilation:  
-&emsp;**g++ parse.cpp converter.cpp build.cpp -o my_program**  
+&emsp;**g++ parse.cpp converter.cpp build.cpp branch_prediction.cpp -o my_program**  
 
 Run the program using:  
 &emsp;For linux:&emsp;**./my_program**  
