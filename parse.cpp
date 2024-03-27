@@ -107,7 +107,7 @@ parser::parser(string path, int mode = 1)
             removeComments();
             strip();
             int pcPos = line.find("pc");
-            if(pcPos != string::npos){
+            if(pcPos != string::npos && (line[pcPos-1] == ' ' || line[pcPos-1] == ',') && (line[pcPos+2] == ' ' || line[pcPos+2] == '+' || line[pcPos+2] == '-')){
                 
                 vector<string> part1 = extractPC(line.substr(0, pcPos));   
                 for(auto word: part1){
@@ -123,7 +123,7 @@ parser::parser(string path, int mode = 1)
                     instruction.push_back(word);
                 }
             }
-            code.push_back({instruction, -1});
+            if(!instruction.empty()) code.push_back({instruction, -1});
         }
     }
 

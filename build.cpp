@@ -51,5 +51,6 @@ int main()
     }
 
     fout.close();
+    system("pause");
     return 0;
 }

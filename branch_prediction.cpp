@@ -125,7 +125,13 @@ void branch_prediction::branch(vector<string> line, int choice)
             BH[last_pc].push_back({0, get<3>(BTB[last_pc])});
         }else if (choice == 3){
             pair<int, int> temp;
+            if(BH[last_pc].size()==0){
+                oneBit = 0;
+            }else{
+                oneBit = BH[last_pc].back().second;
+            }
             temp.first = oneBit;
+
             if(oneBit == false){        //NOT TAKEN
                 if (last_pc + 4 == this_pc)
                 {
@@ -151,6 +157,17 @@ void branch_prediction::branch(vector<string> line, int choice)
             BH[last_pc].push_back(temp);
         }else if (choice == 4){
             pair<int, int> temp;
+            if(BH[last_pc].size()==0){
+                twoBit = 0;
+            }else{
+                twoBit = BH[last_pc].back().first;
+                if(BH[last_pc].back().second == 1){
+                    twoBit = min(3, twoBit + 1);
+                }else{
+                    twoBit = max(0, twoBit - 1);
+                }
+                
+            }
             temp.first = twoBit;
             if(twoBit < 2){        //NOT TAKEN
                 if (last_pc + 4 == this_pc)
@@ -182,7 +199,15 @@ void branch_prediction::branch(vector<string> line, int choice)
     {
         if (line[1] != "jal" && line[1] != "jalr" && line[1] != "j" && line[1] != "jr")
         {
-            offset = stoi(line[2]);
+            if(line[2].substr(1,2) == "0x"){
+                offset = hexatodec(line[2].substr(1));
+                if(line[2][0] == '-'){
+                    offset *= -1;
+                }
+            }else{
+                offset = stoi(line[2]);
+            }
+            
             last_pc = this_pc;
         }
         if(choice == 1){
@@ -200,35 +225,45 @@ void branch_prediction::branch(vector<string> line, int choice)
 }
 
 void branch_prediction::print(int choice){
-    cout << "\n Branch Buffer Table: \n";
-    cout << "\nCurrent PC \t Target PC\n";
-    for(auto itr: BTB){
-        cout << "0x" << hex << itr.first << "\t"<< "0x" << hex << get<0>(itr.second)<<"\n";// << "\t" << get<1>(itr.second).first << get<1>(itr.second).second << "\t" << (get<2>(itr.second) == 1 ? "T" : "NT") << "\t" << (get<3>(itr.second) == 1 ? "T" : "NT") << "\n";
+    ofstream outputFile;
+    if(choice == 1){
+        outputFile.open("always_T_results.txt");
+    }else if(choice == 2){
+        outputFile.open("always_NT_results.txt");
+    }else if(choice == 3){
+        outputFile.open("1_bit_results.txt");
+    }else if(choice == 4){
+        outputFile.open("2_bit_results.txt");
     }
-    cout << "\n";
-    cout << "\n Branch History Table: \n";
-    cout << "\nCurrent PC \t Predicted \t Actual \n";
+    outputFile << "\n Branch Buffer Table: \n";
+    outputFile << "\nCurrent PC \t Target PC\n";
+    for(auto itr: BTB){
+        outputFile << "0x" << hex << itr.first << "\t"<< "0x" << hex << get<0>(itr.second)<<"\n";// << "\t" << get<1>(itr.second).first << get<1>(itr.second).second << "\t" << (get<2>(itr.second) == 1 ? "T" : "NT") << "\t" << (get<3>(itr.second) == 1 ? "T" : "NT") << "\n";
+    }
+    outputFile << "\n";
+    outputFile << "\n Branch History Table: \n";
+    outputFile << "\nCurrent PC \t Predicted \t Actual \n";
     for(auto itr: BH){
-        cout << "0x" << hex << itr.first << ":"<<"\n";
+        outputFile << "0x" << hex << itr.first << ":"<<"\n";
         for(auto hist: itr.second){
             if(choice!=4){
-                cout <<  "\t\t\t" <<(hist.first == 1 ? "T" : "NT") << "\t     " << (hist.second == 1 ? "T" : "NT") << "\n";
+                outputFile <<  "\t\t\t" <<(hist.first == 1 ? "T" : "NT") << "\t     " << (hist.second == 1 ? "T" : "NT") << "\n";
             }else{
                 if(hist.first == 0){
-                    cout << "\t\t Strong NT";
+                    outputFile << "\t\t Strong NT";
                 }else if(hist.first == 1){
-                    cout << "\t\t Weakly NT";
+                    outputFile << "\t\t Weakly NT";
                 }else if(hist.first == 2){
-                    cout << "\t\t Weakly T";
+                    outputFile << "\t\t Weakly T";
                 }else if(hist.first == 3){
-                    cout << "\t\t Strong NT";
+                    outputFile << "\t\t Strong T";
                 }
-                cout << "\t     " << (hist.second == 1 ? "T" : "NT") << "\n";
+                outputFile << "\t     " << (hist.second == 1 ? "T" : "NT") << "\n";
             }
             
         }
     }
-    cout << "\n";
+    outputFile << "\n";
 }
 
 long long branch_prediction::hexatodec(string hexVal)
